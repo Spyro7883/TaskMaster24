@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 
 export default function App() {
-  const [state, setState] = useState('')
   const [tasksOptions, setTasksOptions] = useState('')
   const [containerOptions, setContainerOptions] = useState('')
   const [containerList, setContainerList] = useState(() => {
@@ -16,22 +15,36 @@ export default function App() {
     return savedTasks ? JSON.parse(savedTasks) : [];
 
   });
+  const [taskInput, setTaskInput] = useState('');
   const createContainer = () => {
-    console.log("in creation")
     const entityContainer = []
+    entityContainer.push("test var")
     setContainerList([...containerList, entityContainer])
-    // containerList.map((values) => console.log(values))
   }
 
-  const createTask = () => {
-    console.log("in creation")
-    const entityTask = []
-    setTasksList([...tasksList, entityTask])
+  const createTask = (index) => {
+    let newContainerList = [...containerList];
+
+    if (newContainerList[index]) {
+      newContainerList[index] = [...newContainerList[index], ""];
+    } else {
+      console.log("Container does not exist");
+    }
+
+    setContainerList(newContainerList);
   }
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    setState(value);
+    setTaskInput(value)
+    // let newContainerList = [...containerList];
+
+    // if (newContainerList[c_index][t_index]) {
+    //   newContainerList[c_index][t_index] = [...newContainerList[c_index][t_index], value];
+    // } else {
+    //   console.log("Container does not exist");
+    // }
+    // setContainerList(newContainerList);
   }
 
   return (
@@ -70,13 +83,12 @@ export default function App() {
           </section>)
         } */}
         <button onClick={createContainer} >Add a new list</button>
-        {containerList.map((item, index) =>
-          <div key={index}>
-            {tasksList.map((item, index) =>
-              <input key={index} onClick={handleInputChange}>
-
-              </input>)}
-            <button onClick={createTask} >Add a new task</button>
+        {containerList.map((item, c_index) =>
+          <div key={c_index}>
+            {item.map((t_item, t_index) =>
+              <input key={t_index} type="text" onChange={handleInputChange} value={t_item} />
+            )}
+            <button onClick={() => createTask(c_index)} >Add a new task</button>
           </div>
         )}
       </main>
