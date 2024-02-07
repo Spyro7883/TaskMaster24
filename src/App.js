@@ -10,41 +10,38 @@ export default function App() {
     const savedContainers = localStorage.getItem('containerList');
     return savedContainers ? JSON.parse(savedContainers) : [];
   });
-  const [tasksList, setTasksList] = useState(() => {
-    const savedTasks = localStorage.getItem('tasksList');
-    return savedTasks ? JSON.parse(savedTasks) : [];
 
-  });
-  const [taskInput, setTaskInput] = useState('');
-  const createContainer = () => {
-    const entityContainer = []
-    entityContainer.push("test var")
-    setContainerList([...containerList, entityContainer])
-  }
-
-  const createTask = (index) => {
+  const createEntity = (index) => {
     let newContainerList = [...containerList];
-
-    if (newContainerList[index]) {
-      newContainerList[index] = [...newContainerList[index], ""];
+    if (index === undefined) {
+      newContainerList.push(["Add a title"])
+    } else if (newContainerList[index]) {
+      newContainerList[index].push("");
     } else {
       console.log("Container does not exist");
     }
-
-    setContainerList(newContainerList);
+    setContainerList(newContainerList)
   }
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setTaskInput(value)
-    // let newContainerList = [...containerList];
+  const copyContainer = (containerIndex) => {
+    let newContainerList = [...containerList];
+    newContainerList.splice(containerIndex + 1, 0, newContainerList[containerIndex])
+    setContainerList(newContainerList)
+  }
 
-    // if (newContainerList[c_index][t_index]) {
-    //   newContainerList[c_index][t_index] = [...newContainerList[c_index][t_index], value];
-    // } else {
-    //   console.log("Container does not exist");
-    // }
-    // setContainerList(newContainerList);
+  const handleInputChange = (containerIndex, taskIndex) => (e) => {
+    let newContainerList = [...containerList];
+
+    if (newContainerList[containerIndex]) {
+      if (taskIndex < newContainerList[containerIndex].length) {
+        newContainerList[containerIndex][taskIndex] = e.target.value;
+      } else {
+        console.log("Task does not exist");
+      }
+    } else {
+      console.log("Container does not exist");
+    }
+    setContainerList(newContainerList);
   }
 
   return (
@@ -58,7 +55,6 @@ export default function App() {
       <main>
         {/* {containerList.map((container) =>
           <section>
-            {container.title ? <input>{container.title}</input> : <input>Enter list title</input>}
             <button onClick={() => { setContainerOptions(true) }}>
               <div>
                 <button onClick={setContainerOptions(false)}>❌</button>
@@ -82,15 +78,23 @@ export default function App() {
             <button onClick={'createInput'}>Add new task</button>
           </section>)
         } */}
-        <button onClick={createContainer} >Add a new list</button>
-        {containerList.map((item, c_index) =>
-          <div key={c_index}>
-            {item.map((t_item, t_index) =>
-              <input key={t_index} type="text" onChange={handleInputChange} value={t_item} />
-            )}
-            <button onClick={() => createTask(c_index)} >Add a new task</button>
+        <button onClick={() => createEntity()} >Add a new list</button>
+        <button onClick={() => console.log(containerList)} >Show container list</button>
+        {Object.entries(containerList).map(([containerIndex, tasks]) => (
+          <div key={containerIndex}>
+            <button onClick={() => copyContainer(containerIndex)}>Copy container</button>
+            {tasks.map((task, taskIndex) => (
+              <input
+                key={`${containerIndex}-${taskIndex}`}
+                type="text"
+                onChange={handleInputChange(containerIndex, taskIndex)}
+                value={task}
+              />
+            ))}
+            <button onClick={() => createEntity(containerIndex)}>Add a new task</button>
           </div>
-        )}
+        ))}
+
       </main>
       <footer />
     </>
