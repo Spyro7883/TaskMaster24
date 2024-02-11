@@ -6,7 +6,7 @@ export default function App() {
     const savedContainers = localStorage.getItem('containerList');
     return savedContainers ? JSON.parse(savedContainers) : [];
   });
-  const [manageOptions, setManageOptions] = useState(new Map())
+  const [manageOptions, setManageOptions] = useState(new Map());
 
   const createEntity = (index) => {
     let newContainerList = [...containerList];
@@ -17,7 +17,7 @@ export default function App() {
       manageOptions.set(key, false);
     } else if (newContainerList[index] && newContainerList[index][newContainerList[index].length - 1] !== "") {
       newContainerList[index].push("");
-      key = `${newContainerList.length - 1}-${index}`;
+      key = `${newContainerList.length - 1}-${newContainerList[index].length - 1}`;
       manageOptions.set(key, false);
     } else if (newContainerList[index][newContainerList[index].length - 1] === "") {
       console.log("Last task is empty");
@@ -32,27 +32,35 @@ export default function App() {
 
   const copyEntity = (containerIndex, taskIndex) => {
     let newContainerList = [...containerList];
+    let newOptions = new Map(manageOptions);
     if (taskIndex === undefined) {
       newContainerList.splice(containerIndex + 1, 0, newContainerList[containerIndex].filter(task => task));
+      newOptions.set(containerIndex, false)
     } else if (newContainerList[containerIndex][taskIndex]) {
       newContainerList[containerIndex].splice(taskIndex + 1, 0, newContainerList[containerIndex][taskIndex])
+      newOptions.set(`${containerIndex}-${taskIndex}`, false)
     } else {
       console.log("Task can't be copied");
     }
     setContainerList(newContainerList)
+    setManageOptions(newOptions)
     localStorage.setItem('containerList', JSON.stringify(newContainerList));
   }
 
   const removeEntity = (containerIndex, taskIndex) => {
     let newContainerList = [...containerList];
+    let newOptions = new Map(manageOptions);
     if (taskIndex === undefined) {
       newContainerList.splice(containerIndex, 1);
+      newOptions.delete(containerIndex)
     } else if (newContainerList[containerIndex][taskIndex]) {
       newContainerList[containerIndex].splice(taskIndex, 1);
+      newOptions.delete(`${containerIndex}-${taskIndex}`)
     } else {
       console.log("Task can't be removed");
     }
     setContainerList(newContainerList)
+    setManageOptions(newOptions)
     localStorage.setItem('containerList', JSON.stringify(newContainerList));
   }
 
